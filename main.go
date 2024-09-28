@@ -3,6 +3,7 @@ package main
 import (
 	"clilistener/utils/shell"
 	"fmt"
+	"strconv"
 )
 
 func main() {
@@ -12,13 +13,11 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Found shell and path:", shell, path)
-
 	history, err := Shell.GetCommandHistory(shell, path)
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("History:", len(history))
+	fmt.Println(strconv.Itoa(len(history)) + " commands found")
 }
