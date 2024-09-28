@@ -7,6 +7,7 @@ import (
 	UIHelpers "trendify/utils/uiHelpers"
 )
 
+// TODO: Add different CLI flags for charts, suggestions, etc
 func main() {
 	if err := ui.Init(); err != nil {
 		panic(err)
