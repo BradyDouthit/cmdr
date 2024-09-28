@@ -18,7 +18,7 @@ func BuildBarChart(commands []Shell.Command) *widgets.BarChart {
 	bc.Title = "Common Commands"
 	bc.Data = data
 	bc.Labels = labels
-	bc.SetRect(5, 5, 70, 36)
+	bc.SetRect(5, 5, 100, 25)
 	bc.BarWidth = 10
 	bc.BarGap = 5
 

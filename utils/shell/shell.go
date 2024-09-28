@@ -32,10 +32,12 @@ func GetCommand(shell, line string, index float64) (Command, error) {
 		}
 
 		command := strings.Split(cleanedLine, ";")[1]
+		// just the command, no args
+		cleanedCommand := strings.Split(command, " ")[0]
 
 		return Command{
 			Timestamp: timestamp,
-			Command:   command,
+			Command:   cleanedCommand,
 			Duration:  duration,
 			Index:     index,
 		}, nil
