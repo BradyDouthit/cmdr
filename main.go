@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,16 +9,19 @@ import (
 )
 
 func main() {
-	shell, path := detectShell()
+	shell, path, err := detectShell()
 
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Found shell and path:", shell, path)
 }
 
-func detectShell() (string, string) {
+func detectShell() (string, string, error) {
 	homeDir, err := os.UserHomeDir()
 
 	if err != nil {
-		panic("Could not get home directory")
+		return "", "", fmt.Errorf("could not get home directory: %w", err)
 	}
 
 	shell := os.Getenv("SHELL")
@@ -41,5 +45,9 @@ func detectShell() (string, string) {
 		break
 	}
 
-	return shellSuffix, historyFilePath
+	if _, err := os.Stat(historyFilePath); errors.Is(err, os.ErrNotExist) {
+		return shellSuffix, "", fmt.Errorf("could not find history file at %s", historyFilePath)
+	}
+
+	return shellSuffix, historyFilePath, nil
 }
