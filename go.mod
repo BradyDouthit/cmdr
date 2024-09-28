@@ -1,3 +1,3 @@
-module cli-listener
+module clilistener
 
 go 1.22.5

@@ -8,13 +8,54 @@ import (
 	"strings"
 )
 
+// TODO: Add support for separating the args from the command. Should also convert timestamp to a golang time object or number
+type Command struct {
+	Timestamp string
+	Command   string
+}
+
 func main() {
 	shell, path, err := detectShell()
 
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Found shell and path:", shell, path)
+
+	history, err := getCommandHistory(shell, path)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("History:", len(history))
+}
+
+func getCommand(shell, line string) (*Command, error) {
+	return nil, nil
+}
+
+func getCommandHistory(shell, historyFilePath string) ([]string, error) {
+	var history []string
+
+	data, err := os.ReadFile(historyFilePath)
+
+	if err != nil {
+		return history, fmt.Errorf("could not read history file: %w", err)
+	}
+
+	for _, line := range strings.Split(string(data), "\n") {
+		_, err := getCommand(shell, line)
+
+		if err != nil {
+			return history, fmt.Errorf("could not parse command: %w", err)
+		}
+
+		fmt.Println("Line:", line)
+	}
+
+	return history, nil
 }
 
 func detectShell() (string, string, error) {
