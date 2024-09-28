@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -12,14 +13,37 @@ import (
 type Command struct {
 	Timestamp string
 	Command   string
+	Duration  float64
 }
 
-func GetCommand(shell, line string) (*Command, error) {
-	return nil, nil
+func GetCommand(shell, line string) (Command, error) {
+	const linePrefix = " : "
+
+	cleanedLine := strings.TrimPrefix(line, linePrefix)
+
+	if !strings.HasSuffix(cleanedLine, "\\") && len(line) > 0 {
+		timestamp := sliceBetweenSubstrings(cleanedLine, ":", ":")
+		durationStr := sliceBetweenSubstrings(cleanedLine, timestamp+":", ";")
+		duration, err := strconv.ParseFloat(durationStr, 32)
+
+		if err != nil {
+			return Command{}, fmt.Errorf("could not parse duration: %w", err)
+		}
+
+		command := strings.Split(cleanedLine, ";")[1]
+
+		return Command{
+			Timestamp: timestamp,
+			Command:   command,
+			Duration:  duration,
+		}, nil
+	}
+
+	return Command{}, fmt.Errorf("TODO: Parse multiline commands")
 }
 
-func GetCommandHistory(shell, historyFilePath string) ([]string, error) {
-	var history []string
+func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
+	var history []Command
 
 	data, err := os.ReadFile(historyFilePath)
 
@@ -28,13 +52,13 @@ func GetCommandHistory(shell, historyFilePath string) ([]string, error) {
 	}
 
 	for _, line := range strings.Split(string(data), "\n") {
-		_, err := GetCommand(shell, line)
+		command, err := GetCommand(shell, line)
 
 		if err != nil {
-			return history, fmt.Errorf("could not parse command: %w", err)
+			continue
 		}
 
-		fmt.Println("Line:", line)
+		history = append(history, command)
 	}
 
 	return history, nil
@@ -73,4 +97,20 @@ func DetectShell() (string, string, error) {
 	}
 
 	return shellSuffix, historyFilePath, nil
+}
+
+func sliceBetweenSubstrings(str, start, end string) string {
+	startIndex := strings.Index(str, start)
+	if startIndex == -1 {
+		return "" // Start substring not found
+	}
+	startIndex += len(start)
+
+	endIndex := strings.Index(str[startIndex:], end)
+	if endIndex == -1 {
+		return "" // End substring not found
+	}
+	endIndex += startIndex
+
+	return str[startIndex:endIndex]
 }
