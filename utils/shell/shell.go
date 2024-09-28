@@ -14,9 +14,10 @@ type Command struct {
 	Timestamp string
 	Command   string
 	Duration  float64
+	Index     float64
 }
 
-func GetCommand(shell, line string) (Command, error) {
+func GetCommand(shell, line string, index float64) (Command, error) {
 	const linePrefix = " : "
 
 	cleanedLine := strings.TrimPrefix(line, linePrefix)
@@ -36,6 +37,7 @@ func GetCommand(shell, line string) (Command, error) {
 			Timestamp: timestamp,
 			Command:   command,
 			Duration:  duration,
+			Index:     index,
 		}, nil
 	}
 
@@ -51,8 +53,9 @@ func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
 		return history, fmt.Errorf("could not read history file: %w", err)
 	}
 
-	for _, line := range strings.Split(string(data), "\n") {
-		command, err := GetCommand(shell, line)
+	for index, line := range strings.Split(string(data), "\n") {
+		floatIndex := float64(index)
+		command, err := GetCommand(shell, line, floatIndex)
 
 		if err != nil {
 			continue
