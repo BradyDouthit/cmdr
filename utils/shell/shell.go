@@ -17,6 +17,11 @@ type Command struct {
 	Duration  float64
 }
 
+type CommandCount struct {
+	Command string
+	Count   int
+}
+
 func GetCommand(shell, line string) (Command, error) {
 	const linePrefix = " : "
 
@@ -107,7 +112,7 @@ func DetectShell() (string, string, error) {
 	return shellSuffix, historyFilePath, nil
 }
 
-func GetTopCommands(history []Command, count int) []Command {
+func GetTopCommands(history []Command, count int) []CommandCount {
 	// Create a map to store command counts
 	commandCounts := make(map[string]int)
 
@@ -133,12 +138,13 @@ func GetTopCommands(history []Command, count int) []Command {
 		topN = uniqueCommands[:count]
 	}
 
+	var topCommands []CommandCount
 	// Log the counts for each of the top N commands
 	for _, cmd := range topN {
-		fmt.Printf("Command: %s, Count: %d\n", cmd.Command, commandCounts[cmd.Command])
+		topCommands = append(topCommands, CommandCount{Command: cmd.Command, Count: commandCounts[cmd.Command]})
 	}
 
-	return topN
+	return topCommands
 }
 
 func sliceBetweenSubstrings(str, start, end string) string {
