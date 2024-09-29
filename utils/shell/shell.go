@@ -26,7 +26,7 @@ func GetCommand(shell, line string) (Command, error) {
 		timestamp := sliceBetweenSubstrings(cleanedLine, ":", ":")
 		durationStr := sliceBetweenSubstrings(cleanedLine, timestamp+":", ";")
 		duration, err := strconv.ParseFloat(durationStr, 32)
-		command := ""
+		command := cleanedLine
 
 		if err != nil {
 			return Command{Timestamp: timestamp, Command: command, Duration: 0}, fmt.Errorf("could not parse duration: %w", err)
@@ -38,12 +38,17 @@ func GetCommand(shell, line string) (Command, error) {
 			Duration:  duration,
 		}, nil
 	} else if !strings.HasPrefix(cleanedLine, ":") {
-		// TODO: Handle no timestamp
-		return Command{
-			Timestamp: "",
-			Command:   cleanedLine,
-			Duration:  0,
-		}, nil
+		// TODO: Handle no timestamp and more edge cases where the format changes
+		split := strings.Split(cleanedLine, " ")
+		if len(split) > 1 {
+			return Command{
+				Timestamp: "",
+				Command:   split[1],
+				Duration:  0,
+			}, nil
+		}
+
+		return Command{}, fmt.Errorf("command not found")
 	}
 
 	return Command{}, fmt.Errorf("TODO: Parse multiline commands")
@@ -103,39 +108,37 @@ func DetectShell() (string, string, error) {
 }
 
 func GetTopCommands(history []Command, count int) []Command {
-	topCommands := make(map[string]int)
+	// Create a map to store command counts
+	commandCounts := make(map[string]int)
 
-	fmt.Println(topCommands)
-	for _, command := range history {
-		topCommands[command.Command]++
+	// Count occurrences of each command
+	for _, cmd := range history {
+		commandCounts[cmd.Command]++
 	}
 
-	// Create a slice of Command structs to store the top commands
-	var result []Command
-
-	// Convert map to slice of key-value pairs
-	pairs := make([]struct {
-		cmd   string
-		count int
-	}, 0, len(topCommands))
-	for cmd, count := range topCommands {
-		pairs = append(pairs, struct {
-			cmd   string
-			count int
-		}{cmd, count})
+	// Create a slice to store unique commands
+	uniqueCommands := make([]Command, 0, len(commandCounts))
+	for cmd := range commandCounts {
+		uniqueCommands = append(uniqueCommands, Command{Command: cmd})
 	}
 
-	// Sort the pairs slice by count in descending order
-	sort.Slice(pairs, func(i, j int) bool {
-		return pairs[i].count > pairs[j].count
+	// Sort commands by count in descending order
+	sort.Slice(uniqueCommands, func(i, j int) bool {
+		return commandCounts[uniqueCommands[i].Command] > commandCounts[uniqueCommands[j].Command]
 	})
 
-	// Take the top N commands
-	for i := 0; i < count && i < len(pairs); i++ {
-		result = append(result, Command{Command: pairs[i].cmd})
+	// Get the top N commands
+	topN := uniqueCommands
+	if len(uniqueCommands) > count {
+		topN = uniqueCommands[:count]
 	}
 
-	return result
+	// Log the counts for each of the top N commands
+	for _, cmd := range topN {
+		fmt.Printf("Command: %s, Count: %d\n", cmd.Command, commandCounts[cmd.Command])
+	}
+
+	return topN
 }
 
 func sliceBetweenSubstrings(str, start, end string) string {

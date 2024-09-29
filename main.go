@@ -3,7 +3,6 @@ package main
 import (
 	Shell "clilistener/utils/shell"
 	"fmt"
-	"strconv"
 )
 
 func main() {
@@ -20,5 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(strconv.Itoa(len(history)) + " commands found")
+	topCommands := Shell.GetTopCommands(history, 10)
+
+	fmt.Println(topCommands)
 }
