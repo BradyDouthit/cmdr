@@ -26,13 +26,13 @@ func GetCommand(shell, line string) (Command, error) {
 		parts := strings.Split(line, " ")
 
 		if len(parts) == 0 {
-			return Command{}, errors.New("invalid command")
+			return Command{}, errors.New("Found an empty line in the history file")
 		}
 
 		mainCommand := strings.TrimSpace(parts[0])
 
 		if len(mainCommand) == 0 {
-			return Command{}, errors.New("invalid command")
+			return Command{}, errors.New("Found an empty command in the history file")
 		}
 
 		return Command{
