@@ -1,2 +1,2 @@
-# cli-listener
-CLI tool that simply logs all of your CLI commands to the terminal as you write them.
+# Trendify
+Trendify is a CLI tool that helps you analyze your command history.
