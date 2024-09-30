@@ -10,6 +10,7 @@ import (
 func main() {
 	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
 	includeArgsLong := flag.Bool("args", false, "Include arguments in the output")
+	topN := flag.Int("top", 5, "Number of top commands to display")
 	flag.Parse()
 	shell, path, err := Shell.DetectShell()
 
@@ -23,7 +24,7 @@ func main() {
 		panic(err)
 	}
 
-	topCommands := Shell.GetTopCommands(history, 5, *includeArgsShort || *includeArgsLong)
+	topCommands := Shell.GetTopCommands(history, *topN, *includeArgsShort || *includeArgsLong)
 
 	for _, command := range topCommands {
 		fmt.Printf("You have used %s %d times\n", command.Command, command.Count)
