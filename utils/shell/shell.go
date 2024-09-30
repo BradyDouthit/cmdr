@@ -5,41 +5,44 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
+	"runtime"
+	"sort"
 	"strings"
 )
 
 // TODO: Add support for separating the args from the command. Should also convert timestamp to a golang time object or number
 type Command struct {
-	Timestamp string
-	Command   string
-	Duration  float64
+	Command string
+	Args    []string
+}
+
+type CommandCount struct {
+	Command string
+	Count   int
 }
 
 func GetCommand(shell, line string) (Command, error) {
-	const linePrefix = " : "
+	if shell == "bash" {
+		parts := strings.Split(line, " ")
 
-	cleanedLine := strings.TrimPrefix(line, linePrefix)
-
-	if !strings.HasSuffix(cleanedLine, "\\") && len(line) > 0 {
-		timestamp := sliceBetweenSubstrings(cleanedLine, ":", ":")
-		durationStr := sliceBetweenSubstrings(cleanedLine, timestamp+":", ";")
-		duration, err := strconv.ParseFloat(durationStr, 32)
-
-		if err != nil {
-			return Command{}, fmt.Errorf("could not parse duration: %w", err)
+		if len(parts) == 0 {
+			return Command{}, errors.New("Found an empty line in the history file")
 		}
 
-		command := strings.Split(cleanedLine, ";")[1]
+		mainCommand := strings.TrimSpace(parts[0])
+
+		if len(mainCommand) == 0 {
+			return Command{}, errors.New("Found an empty command in the history file")
+		}
 
 		return Command{
-			Timestamp: timestamp,
-			Command:   command,
-			Duration:  duration,
+			Command: mainCommand,
+			Args:    parts[1:],
 		}, nil
 	}
 
-	return Command{}, fmt.Errorf("TODO: Parse multiline commands")
+	// TODO: Add support for other shells
+	return Command{}, nil
 }
 
 func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
@@ -72,7 +75,14 @@ func DetectShell() (string, string, error) {
 	}
 
 	shell := os.Getenv("SHELL")
-	shellSuffix := shell[strings.LastIndex(shell, "/")+1:]
+	var shellSuffix string
+
+	if runtime.GOOS == "windows" {
+		executableName := shell[strings.LastIndex(shell, "\\")+1:]
+		shellSuffix = strings.Split(executableName, ".")[0]
+	} else {
+		shellSuffix = shell[strings.LastIndex(shell, "/")+1:]
+	}
 
 	// The path that the CLI history is saved to
 	var historyFilePath string
@@ -97,6 +107,45 @@ func DetectShell() (string, string, error) {
 	}
 
 	return shellSuffix, historyFilePath, nil
+}
+
+func GetTopCommands(history []Command, count int, includeArgs bool) []CommandCount {
+	// Create a map to store command counts
+	commandCounts := make(map[string]int)
+
+	// Count occurrences of each command
+	for _, cmd := range history {
+		if includeArgs {
+			commandCounts[cmd.Command+" "+strings.Join(cmd.Args, " ")]++
+		} else {
+			commandCounts[cmd.Command]++
+		}
+	}
+
+	// Create a slice to store unique commands
+	uniqueCommands := make([]Command, 0, len(commandCounts))
+	for cmd := range commandCounts {
+		uniqueCommands = append(uniqueCommands, Command{Command: cmd})
+	}
+
+	// Sort commands by count in descending order
+	sort.Slice(uniqueCommands, func(i, j int) bool {
+		return commandCounts[uniqueCommands[i].Command] > commandCounts[uniqueCommands[j].Command]
+	})
+
+	// Get the top N commands
+	topN := uniqueCommands
+	if len(uniqueCommands) > count {
+		topN = uniqueCommands[:count]
+	}
+
+	var topCommands []CommandCount
+	// Log the counts for each of the top N commands
+	for _, cmd := range topN {
+		topCommands = append(topCommands, CommandCount{Command: cmd.Command, Count: commandCounts[cmd.Command]})
+	}
+
+	return topCommands
 }
 
 func sliceBetweenSubstrings(str, start, end string) string {
