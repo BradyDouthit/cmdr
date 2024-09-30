@@ -2,34 +2,10 @@ package main
 
 import (
 	Shell "clilistener/utils/shell"
+	UI "clilistener/utils/ui"
 	"flag"
-	"fmt"
 	"os"
-
-	"github.com/charmbracelet/lipgloss"
 )
-
-func renderTopCommands(command Shell.CommandCount) {
-	primaryStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#F0F0F0"))
-
-	commandStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#61AFEF")).
-		Background(lipgloss.Color("#011b30")).
-		Bold(true)
-
-	countStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#98C379")).
-		Bold(true)
-
-	output := primaryStyle.Render("You have used ") +
-		commandStyle.Render(command.Command) +
-		primaryStyle.Render(" ") +
-		countStyle.Render(fmt.Sprintf("%d", command.Count)) +
-		primaryStyle.Render(" times")
-
-	fmt.Println(output)
-}
 
 func main() {
 	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
@@ -50,9 +26,7 @@ func main() {
 
 	topCommands := Shell.GetTopCommands(history, *topN, *includeArgsShort || *includeArgsLong)
 
-	for _, command := range topCommands {
-		renderTopCommands(command)
-	}
+	UI.RenderTopCommands(topCommands)
 
 	os.Exit(0)
 }
