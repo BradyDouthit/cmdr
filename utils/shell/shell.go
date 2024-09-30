@@ -29,7 +29,7 @@ func GetCommand(shell, line string) (Command, error) {
 			return Command{}, errors.New("invalid command")
 		}
 
-		mainCommand := strings.Trim(parts[0], " ")
+		mainCommand := strings.TrimSpace(parts[0])
 
 		if len(mainCommand) == 0 {
 			return Command{}, errors.New("invalid command")
@@ -55,7 +55,11 @@ func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
 	}
 
 	for _, line := range strings.Split(string(data), "\n") {
-		command, _ := GetCommand(shell, line)
+		command, err := GetCommand(shell, line)
+
+		if err != nil {
+			continue
+		}
 
 		history = append(history, command)
 	}
