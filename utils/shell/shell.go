@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -23,43 +23,12 @@ type CommandCount struct {
 }
 
 func GetCommand(shell, line string) (Command, error) {
-	const linePrefix = " : "
-
-	cleanedLine := strings.TrimPrefix(line, linePrefix)
-
-	if !strings.HasSuffix(cleanedLine, "\\") && len(line) > 0 {
-		timestamp := sliceBetweenSubstrings(cleanedLine, ":", ":")
-		durationStr := sliceBetweenSubstrings(cleanedLine, timestamp+":", ";")
-		duration, err := strconv.ParseFloat(durationStr, 32)
-		command := cleanedLine
-
-		if err != nil {
-			return Command{Timestamp: timestamp, Command: command, Duration: 0}, fmt.Errorf("could not parse duration: %w", err)
-		}
-
-		return Command{
-			Timestamp: timestamp,
-			Command:   command,
-			Duration:  duration,
-		}, nil
-	} else if !strings.HasPrefix(cleanedLine, ":") {
-		// TODO: Handle no timestamp and more edge cases where the format changes
-		split := strings.Split(cleanedLine, " ")
-		if len(split) > 1 {
-			return Command{
-				Timestamp: "",
-				Command:   split[1],
-				Duration:  0,
-			}, nil
-		}
-
-		return Command{}, fmt.Errorf("command not found")
-	}
-
-	return Command{}, fmt.Errorf("TODO: Parse multiline commands")
+	// fmt.Println(line)
+	return Command{}, nil
 }
 
 func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
+	fmt.Println(shell)
 	var history []Command
 
 	data, err := os.ReadFile(historyFilePath)
@@ -85,7 +54,14 @@ func DetectShell() (string, string, error) {
 	}
 
 	shell := os.Getenv("SHELL")
-	shellSuffix := shell[strings.LastIndex(shell, "/")+1:]
+	var shellSuffix string
+
+	if runtime.GOOS == "windows" {
+		executableName := shell[strings.LastIndex(shell, "\\")+1:]
+		shellSuffix = strings.Split(executableName, ".")[0]
+	} else {
+		shellSuffix = shell[strings.LastIndex(shell, "/")+1:]
+	}
 
 	// The path that the CLI history is saved to
 	var historyFilePath string
@@ -112,7 +88,7 @@ func DetectShell() (string, string, error) {
 	return shellSuffix, historyFilePath, nil
 }
 
-func GetTopCommands(history []Command, count int) []CommandCount {
+func GetTopCommands(history []Command, count int, includeArgs bool) []CommandCount {
 	// Create a map to store command counts
 	commandCounts := make(map[string]int)
 
