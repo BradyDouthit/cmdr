@@ -18,7 +18,7 @@ func RenderTopCommands(command []Shell.CommandCount) {
 			Bold(true)
 
 		countStyle := lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#98C379")).
+			Foreground(lipgloss.Color("#F0F0F0")).
 			Bold(true)
 
 		output := primaryStyle.Render("You have used ") +
