@@ -12,9 +12,8 @@ import (
 
 // TODO: Add support for separating the args from the command. Should also convert timestamp to a golang time object or number
 type Command struct {
-	Timestamp string
-	Command   string
-	Duration  float64
+	Command string
+	Args    []string
 }
 
 type CommandCount struct {
@@ -23,12 +22,30 @@ type CommandCount struct {
 }
 
 func GetCommand(shell, line string) (Command, error) {
-	// fmt.Println(line)
+	if shell == "bash" {
+		parts := strings.Split(line, " ")
+
+		if len(parts) == 0 {
+			return Command{}, errors.New("invalid command")
+		}
+
+		mainCommand := strings.Trim(parts[0], " ")
+
+		if len(mainCommand) == 0 {
+			return Command{}, errors.New("invalid command")
+		}
+
+		return Command{
+			Command: mainCommand,
+			Args:    parts[1:],
+		}, nil
+	}
+
+	// TODO: Add support for other shells
 	return Command{}, nil
 }
 
 func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
-	fmt.Println(shell)
 	var history []Command
 
 	data, err := os.ReadFile(historyFilePath)
@@ -94,7 +111,11 @@ func GetTopCommands(history []Command, count int, includeArgs bool) []CommandCou
 
 	// Count occurrences of each command
 	for _, cmd := range history {
-		commandCounts[cmd.Command]++
+		if includeArgs {
+			commandCounts[cmd.Command+" "+strings.Join(cmd.Args, " ")]++
+		} else {
+			commandCounts[cmd.Command]++
+		}
 	}
 
 	// Create a slice to store unique commands
