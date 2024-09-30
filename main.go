@@ -9,22 +9,29 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-func main() {
-	// Primary Text Style
+func renderTopCommands(command Shell.CommandCount) {
 	primaryStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#F0F0F0")).
-		Background(lipgloss.Color("#1E1E1E"))
+		Foreground(lipgloss.Color("#F0F0F0"))
 
-	// Command Style
 	commandStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#61AFEF")).
+		Background(lipgloss.Color("#011b30")).
 		Bold(true)
 
-	// Count Style
 	countStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#98C379")).
 		Bold(true)
 
+	output := primaryStyle.Render("You have used ") +
+		commandStyle.Render(command.Command) +
+		primaryStyle.Render(" ") +
+		countStyle.Render(fmt.Sprintf("%d", command.Count)) +
+		primaryStyle.Render(" times")
+
+	fmt.Println(output)
+}
+
+func main() {
 	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
 	includeArgsLong := flag.Bool("args", false, "Include arguments in the output")
 	topN := flag.Int("top", 5, "Number of top commands to display")
@@ -44,13 +51,7 @@ func main() {
 	topCommands := Shell.GetTopCommands(history, *topN, *includeArgsShort || *includeArgsLong)
 
 	for _, command := range topCommands {
-		output := primaryStyle.Render("You have used ") +
-			commandStyle.Render(command.Command) +
-			primaryStyle.Render(" ") +
-			countStyle.Render(fmt.Sprintf("%d", command.Count)) +
-			primaryStyle.Render(" times")
-
-		fmt.Println(output)
+		renderTopCommands(command)
 	}
 
 	os.Exit(0)
