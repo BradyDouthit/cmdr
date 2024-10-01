@@ -100,6 +100,11 @@ To install Trendify, you'll need to have Go installed on your system. Follow the
 
 Note: Make sure you have Go installed and properly configured on your system before following these steps.
 
+## Dependencies
+
+Trendify uses the following dependencies:
+- [Lipgloss](https://github.com/charmbracelet/lipgloss)
+
 ## Contributing
 
 [Add contribution guidelines here]
