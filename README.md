@@ -54,16 +54,14 @@ Here are some example commands to get you started with Trendify:
    ```
    or
    ```
-   $ trendify --mistakes
+   $ trendify --mistakes --top=2
    ```
-
-## Installation
 
 ## Installation
 
 To install Trendify, you'll need to have Go installed on your system. Follow these steps:
 
-### Linux and Windows (WSL)
+### Linux
 
 1. Clone the repository:
    ```
@@ -83,7 +81,7 @@ To install Trendify, you'll need to have Go installed on your system. Follow the
 
 4. You can now run `trendify` from anywhere in your terminal.
 
-### Windows (Native)
+### Windows
 
 1. Clone the repository:
    ```
