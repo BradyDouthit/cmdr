@@ -94,7 +94,7 @@ To install Trendify, you'll need to have Go installed on your system. Follow the
    go build -o trendify.exe
    ```
 
-3. Add the directory containing `trendify.exe` to your system's PATH, or move the executable to a directory that's already in your PATH.
+3. Add the directory containing `trendify.exe` to your system's PATH
 
 4. You can now run `trendify` from anywhere in your command prompt or PowerShell.
 
