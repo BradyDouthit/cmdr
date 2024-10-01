@@ -30,3 +30,27 @@ func RenderTopCommands(command []Shell.CommandCount) {
 		fmt.Println(output)
 	}
 }
+
+func RenderMistakes(commands []Shell.CommandCount) {
+	for _, command := range commands {
+		primaryStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#F0F0F0"))
+
+		commandStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#FF6B6B")).
+			Background(lipgloss.Color("#4A0E0E")).
+			Bold(true)
+
+		countStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#F0F0F0")).
+			Bold(true)
+
+		output := primaryStyle.Render("You have used ") +
+			commandStyle.Render(command.Command) +
+			primaryStyle.Render(" ") +
+			countStyle.Render(fmt.Sprintf("%d", command.Count)) +
+			primaryStyle.Render(" times but it does not exist")
+
+		fmt.Println(output)
+	}
+}

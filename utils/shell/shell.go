@@ -4,21 +4,23 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sort"
 	"strings"
 )
 
-// TODO: Add support for separating the args from the command. Should also convert timestamp to a golang time object or number
 type Command struct {
-	Command string
-	Args    []string
+	Command string   // The command itself
+	Exists  bool     // Whether the command exists in the user's PATH
+	Args    []string // The arguments passed to the command
 }
 
 type CommandCount struct {
 	Command string
 	Count   int
+	Exists  bool
 }
 
 func GetCommand(shell, line string) (Command, error) {
@@ -38,6 +40,7 @@ func GetCommand(shell, line string) (Command, error) {
 		return Command{
 			Command: mainCommand,
 			Args:    parts[1:],
+			Exists:  GetCommandExists(mainCommand),
 		}, nil
 	}
 
@@ -109,11 +112,9 @@ func DetectShell() (string, string, error) {
 	return shellSuffix, historyFilePath, nil
 }
 
-func GetTopCommands(history []Command, count int, includeArgs bool) []CommandCount {
-	// Create a map to store command counts
+func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []CommandCount {
 	commandCounts := make(map[string]int)
 
-	// Count occurrences of each command
 	for _, cmd := range history {
 		if includeArgs {
 			commandCounts[cmd.Command+" "+strings.Join(cmd.Args, " ")]++
@@ -122,30 +123,42 @@ func GetTopCommands(history []Command, count int, includeArgs bool) []CommandCou
 		}
 	}
 
-	// Create a slice to store unique commands
-	uniqueCommands := make([]Command, 0, len(commandCounts))
-	for cmd := range commandCounts {
-		uniqueCommands = append(uniqueCommands, Command{Command: cmd})
-	}
-
-	// Sort commands by count in descending order
-	sort.Slice(uniqueCommands, func(i, j int) bool {
-		return commandCounts[uniqueCommands[i].Command] > commandCounts[uniqueCommands[j].Command]
-	})
-
-	// Get the top N commands
-	topN := uniqueCommands
-	if len(uniqueCommands) > count {
-		topN = uniqueCommands[:count]
-	}
-
 	var topCommands []CommandCount
 	// Log the counts for each of the top N commands
-	for _, cmd := range topN {
-		topCommands = append(topCommands, CommandCount{Command: cmd.Command, Count: commandCounts[cmd.Command]})
+	for command, count := range commandCounts {
+		topCommands = append(topCommands, CommandCount{Command: command, Count: count, Exists: GetCommandExists(command)})
+	}
+
+	sort.Slice(topCommands, func(i, j int) bool {
+		return topCommands[i].Count > topCommands[j].Count
+	})
+
+	if len(topCommands) > count {
+		topCommands = topCommands[:count]
 	}
 
 	return topCommands
+}
+
+func GetCommandExists(command string) bool {
+	_, err := exec.LookPath(command)
+
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
+func GetFailedCommands(history []CommandCount, count int) []CommandCount {
+	var failedCommands []CommandCount
+
+	for _, cmd := range history {
+		if !cmd.Exists && len(failedCommands) < count {
+			failedCommands = append(failedCommands, cmd)
+		}
+	}
+	return failedCommands
 }
 
 func sliceBetweenSubstrings(str, start, end string) string {
