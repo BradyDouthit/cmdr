@@ -59,7 +59,48 @@ Here are some example commands to get you started with Trendify:
 
 ## Installation
 
-[Add installation instructions here]
+## Installation
+
+To install Trendify, you'll need to have Go installed on your system. Follow these steps:
+
+### Linux and Windows (WSL)
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/trendify.git
+   cd trendify
+   ```
+
+2. Build the project:
+   ```
+   go build -o trendify
+   ```
+
+3. Move the binary to a directory in your PATH:
+   ```
+   sudo mv trendify /usr/local/bin/
+   ```
+
+4. You can now run `trendify` from anywhere in your terminal.
+
+### Windows (Native)
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/trendify.git
+   cd trendify
+   ```
+
+2. Build the project:
+   ```
+   go build -o trendify.exe
+   ```
+
+3. Add the directory containing `trendify.exe` to your system's PATH, or move the executable to a directory that's already in your PATH.
+
+4. You can now run `trendify` from anywhere in your command prompt or PowerShell.
+
+Note: Make sure you have Go installed and properly configured on your system before following these steps.
 
 ## Contributing
 
