@@ -3,6 +3,7 @@ package ui
 import (
 	Shell "clilistener/utils/shell"
 	"fmt"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 )
@@ -53,4 +54,9 @@ func RenderMistakes(commands []Shell.CommandCount) {
 
 		fmt.Println(output)
 	}
+}
+
+func RenderTime(elapsed time.Duration) {
+	subtleStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#808080"))
+	fmt.Println(subtleStyle.Render(fmt.Sprintf("Execution time: %v", elapsed)))
 }

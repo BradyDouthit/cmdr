@@ -5,9 +5,17 @@ import (
 	UI "clilistener/utils/ui"
 	"flag"
 	"os"
+	"time"
 )
 
+func exit(code int, startTime time.Time) {
+	elapsed := time.Since(startTime)
+	UI.RenderTime(elapsed)
+	os.Exit(code)
+}
+
 func main() {
+	mainStart := time.Now()
 	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
 	includeArgsLong := flag.Bool("args", false, "Include arguments in the output")
 	showMistakesLong := flag.Bool("mistakes", false, "Show mistakes (commands that don't exist in the PATH) in the output")
@@ -30,11 +38,12 @@ func main() {
 		uniqueCommands := Shell.GetUniqueCommandCounts(history, 999, *includeArgsShort || *includeArgsLong)
 		failedCommands := Shell.GetFailedCommands(uniqueCommands, *topN)
 		UI.RenderMistakes(failedCommands)
-		os.Exit(0)
+
+		exit(0, mainStart)
 	}
 
 	topCommands := Shell.GetUniqueCommandCounts(history, *topN, *includeArgsShort || *includeArgsLong)
 	UI.RenderTopCommands(topCommands)
 
-	os.Exit(0)
+	exit(0, mainStart)
 }
