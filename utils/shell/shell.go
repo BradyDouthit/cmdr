@@ -113,20 +113,23 @@ func DetectShell() (string, string, error) {
 }
 
 func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []CommandCount {
-	commandCounts := make(map[string]int)
+	commandCounts := make(map[string]CommandCount)
 
 	for _, cmd := range history {
 		if includeArgs {
-			commandCounts[cmd.Command+" "+strings.Join(cmd.Args, " ")]++
+			fullCommand := cmd.Command + " " + strings.Join(cmd.Args, " ")
+			prevCount := commandCounts[fullCommand].Count
+			commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1, Exists: cmd.Exists}
 		} else {
-			commandCounts[cmd.Command]++
+			prevCount := commandCounts[cmd.Command].Count
+			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1, Exists: cmd.Exists}
 		}
 	}
 
 	var topCommands []CommandCount
 	// Log the counts for each of the top N commands
-	for command, count := range commandCounts {
-		topCommands = append(topCommands, CommandCount{Command: command, Count: count, Exists: GetCommandExists(command)})
+	for _, count := range commandCounts {
+		topCommands = append(topCommands, count)
 	}
 
 	sort.Slice(topCommands, func(i, j int) bool {
