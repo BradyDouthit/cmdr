@@ -29,11 +29,18 @@ Trendify provides insights into your command-line usage patterns with the follow
 
    Example:
    ```
-   $ trendify --mistakes
+   $ trendify --mistakes --top=2
    You have used gti 5 times but it does not exist
    You have used sl 3 times but it does not exist
    ```
 4. **Include or Exclude Arguments**: Use the `--args` flag to include arguments. They are excluded by default.
+
+   Example:
+   ```
+   $ trendify --args
+   You have used git push 10 times
+   You have used ls -l 5 times
+   ```
 
 ## Usage
 
