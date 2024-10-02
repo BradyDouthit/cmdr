@@ -130,6 +130,10 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 	}
 
 	sort.Slice(topCommands, func(i, j int) bool {
+		if topCommands[i].Count == topCommands[j].Count {
+			return topCommands[i].Command < topCommands[j].Command
+		}
+
 		return topCommands[i].Count > topCommands[j].Count
 	})
 
