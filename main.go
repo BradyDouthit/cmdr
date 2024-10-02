@@ -50,11 +50,11 @@ func main() {
 			}
 		}
 
-		if len(uniqueCommands) > *topN {
+		if len(validCommands) > *topN {
 			val := validCommands[:*topN]
 			UI.RenderValid(val)
 		} else {
-			UI.RenderValid(uniqueCommands)
+			UI.RenderValid(validCommands)
 		}
 
 		exit(0, mainStart)
@@ -71,7 +71,7 @@ func main() {
 			}
 		}
 
-		if len(uniqueCommands) > *topN {
+		if len(invalidCommands) > *topN {
 			inv := invalidCommands[:*topN]
 			UI.RenderInvalid(inv)
 		} else {
