@@ -19,8 +19,8 @@ func main() {
 	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
 	includeArgsLong := flag.Bool("args", false, "Include arguments in the output")
 
-	showMistakesLong := flag.Bool("invalid", false, "Show mistakes (commands that aren't available on your system) in the output")
-	showMistakesShort := flag.Bool("I", false, "Show mistakes (commands that aren't available on your system) in the output")
+	showInvalidLong := flag.Bool("invalid", false, "Show invalid (commands that aren't available on your system) in the output")
+	showInvalidShort := flag.Bool("I", false, "Show invalid (commands that aren't available on your system) in the output")
 
 	showValidLong := flag.Bool("valid", false, "Show valid commands in the output")
 	showValidShort := flag.Bool("V", false, "Show valid commands in the output")
@@ -60,7 +60,7 @@ func main() {
 		exit(0, mainStart)
 	}
 
-	if *showMistakesLong || *showMistakesShort {
+	if *showInvalidLong || *showInvalidShort {
 		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
 
 		var invalidCommands []Shell.CommandCount
@@ -73,9 +73,9 @@ func main() {
 
 		if len(uniqueCommands) > *topN {
 			inv := invalidCommands[:*topN]
-			UI.RenderMistakes(inv)
+			UI.RenderInvalid(inv)
 		} else {
-			UI.RenderMistakes(invalidCommands)
+			UI.RenderInvalid(invalidCommands)
 		}
 
 		exit(0, mainStart)

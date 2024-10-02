@@ -32,7 +32,7 @@ func RenderTopCommands(command []Shell.CommandCount) {
 	}
 }
 
-func RenderMistakes(commands []Shell.CommandCount) {
+func RenderInvalid(commands []Shell.CommandCount) {
 	for _, command := range commands {
 		primaryStyle := lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#F0F0F0"))

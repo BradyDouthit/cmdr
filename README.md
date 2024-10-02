@@ -25,11 +25,11 @@ cmdr provides insights into your command-line usage patterns with the following 
    ```
    This will display the top 10 most frequently used commands.
 
-3. **Mistake Analysis**: Use the `-M` or `--mistakes` flag to see commands that you've attempted to run but don't exist or have failed.
+3. **Most Common Mistakes**: Use the `-M` or `--invalid` flag to see commands that you've attempted to run but don't exist or have failed.
 
    Example:
    ```
-   $ cmdr --mistakes --top=2
+   $ cmdr --invalid --top=2
    You have used gti 5 times but it does not exist
    You have used sl 3 times but it does not exist
    ```
@@ -58,11 +58,11 @@ Here are some example commands to get you started with cmdr:
 
 3. View commands that don't exist or have failed:
    ```
-   $ cmdr -M
+   $ cmdr -I
    ```
    or
    ```
-   $ cmdr --mistakes --top=2
+   $ cmdr --invalid --top=2
    ```
 
 ## Installation
