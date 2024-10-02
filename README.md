@@ -73,7 +73,7 @@ To install Trendify, you'll need to have Go installed on your system. Follow the
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/trendify.git
+   git clone https://github.com/BradyDouthit/trendify.git
    cd trendify
    ```
 
@@ -93,7 +93,7 @@ To install Trendify, you'll need to have Go installed on your system. Follow the
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/trendify.git
+   git clone https://github.com/BradyDouthit/trendify.git
    cd trendify
    ```
 
