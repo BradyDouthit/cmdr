@@ -19,8 +19,8 @@ func main() {
 	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
 	includeArgsLong := flag.Bool("args", false, "Include arguments in the output")
 
-	showMistakesLong := flag.Bool("mistakes", false, "Show mistakes (commands that aren't available on your system) in the output")
-	showMistakesShort := flag.Bool("M", false, "Show mistakes (commands that aren't available on your system) in the output")
+	showMistakesLong := flag.Bool("invalid", false, "Show mistakes (commands that aren't available on your system) in the output")
+	showMistakesShort := flag.Bool("I", false, "Show mistakes (commands that aren't available on your system) in the output")
 
 	showValidLong := flag.Bool("valid", false, "Show valid commands in the output")
 	showValidShort := flag.Bool("V", false, "Show valid commands in the output")
