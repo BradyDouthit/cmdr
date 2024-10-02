@@ -1,4 +1,4 @@
-module clilistener
+module cmdr
 
 go 1.22.5
 

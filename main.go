@@ -1,8 +1,8 @@
 package main
 
 import (
-	Shell "clilistener/utils/shell"
-	UI "clilistener/utils/ui"
+	Shell "cmdr/utils/shell"
+	UI "cmdr/utils/ui"
 	"flag"
 	"os"
 	"time"
