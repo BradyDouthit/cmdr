@@ -82,9 +82,9 @@ To install Trendify, you'll need to have Go installed on your system. Follow the
    go build -o trendify
    ```
 
-3. Move the binary to a directory in your PATH:
+3. Add the compiled binary to your system's PATH:
    ```
-   sudo mv trendify /usr/local/bin/
+   export PATH=$PATH:/path/to/trendify
    ```
 
 4. You can now run `trendify` from anywhere in your terminal.
