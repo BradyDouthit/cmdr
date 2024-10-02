@@ -1,5 +1,5 @@
 # cmdr
-cmdr is a CLI tool that helps you analyze your command history.
+`cmdr` is a CLI tool with a goal of helping develpers understand their CLI usage in order to improve efficiency.
 
 ## Features
 
