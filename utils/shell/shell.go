@@ -7,21 +7,30 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
-	"sync"
 )
 
 type Command struct {
 	Command string   // The command itself
 	Args    []string // The arguments passed to the command
+	Valid   bool
 }
 
 type CommandCount struct {
 	Command string
 	Count   int
-	Exists  bool
+	Valid   bool
 }
+
+var BuiltinCommands = []string{"alias", "bg",
+	"bind", "break", "builtin", "case", "cd", "command", "compgen", "complete", "continue",
+	"declare", "dirs", "disown", "echo", "enable", "eval", "exec", "exit", "export", "fc",
+	"fg", "getopts", "hash", "help", "history", "if", "jobs", "kill", "let", "local", "logout",
+	"popd", "printf", "pushd", "pwd", "read", "readonly", "return", "set", "shift", "shopt",
+	"source", "suspend", "test", "times", "trap", "type", "typeset", "ulimit", "umask",
+	"un‐alias", "unset", "until", "wait", "while"}
 
 func GetCommand(shell, line string) (Command, error) {
 	if shell == "bash" {
@@ -107,10 +116,10 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 		if includeArgs {
 			fullCommand := cmd.Command + " " + strings.Join(cmd.Args, " ")
 			prevCount := commandCounts[fullCommand].Count
-			commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1}
+			commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1, Valid: cmd.Valid}
 		} else {
 			prevCount := commandCounts[cmd.Command].Count
-			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1}
+			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1, Valid: cmd.Valid}
 		}
 	}
 
@@ -121,6 +130,10 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 	}
 
 	sort.Slice(topCommands, func(i, j int) bool {
+		if topCommands[i].Count == topCommands[j].Count {
+			return topCommands[i].Command < topCommands[j].Command
+		}
+
 		return topCommands[i].Count > topCommands[j].Count
 	})
 
@@ -132,6 +145,11 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 }
 
 func GetCommandExists(command string) bool {
+	// Validate that this works on windows
+	if slices.Contains(BuiltinCommands, command) {
+		return true
+	}
+
 	_, err := exec.LookPath(command)
 
 	if err == nil {
@@ -147,33 +165,6 @@ func GetCommandExists(command string) bool {
 	}
 
 	return false
-}
-
-func GetFailedCommands(history []CommandCount, count int) []CommandCount {
-	var failedCommands []CommandCount
-	var wg sync.WaitGroup
-
-	for _, cmd := range history {
-		wg.Add(1)
-		go func(cmd CommandCount) {
-			defer wg.Done()
-
-			exists := GetCommandExists(cmd.Command)
-			if !exists {
-				if len(failedCommands) < count {
-					failedCommands = append(failedCommands, CommandCount{Command: cmd.Command, Count: cmd.Count, Exists: exists})
-				}
-			}
-		}(cmd)
-	}
-
-	wg.Wait()
-
-	sort.Slice(failedCommands, func(i, j int) bool {
-		return failedCommands[i].Count > failedCommands[j].Count
-	})
-
-	return failedCommands
 }
 
 func parseCommandOnly(line string) (Command, error) {
@@ -192,6 +183,7 @@ func parseCommandOnly(line string) (Command, error) {
 	return Command{
 		Command: mainCommand,
 		Args:    parts[1:],
+		Valid:   GetCommandExists(mainCommand),
 	}, nil
 
 }

@@ -14,7 +14,7 @@ func RenderTopCommands(command []Shell.CommandCount) {
 			Foreground(lipgloss.Color("#F0F0F0"))
 
 		commandStyle := lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#61AFEF")).
+			Foreground(lipgloss.Color("#d6d6d4")).
 			Background(lipgloss.Color("#011b30")).
 			Bold(true)
 
@@ -22,7 +22,7 @@ func RenderTopCommands(command []Shell.CommandCount) {
 			Foreground(lipgloss.Color("#F0F0F0")).
 			Bold(true)
 
-		output := primaryStyle.Render("You have used ") +
+		output := primaryStyle.Render("You ran ") +
 			commandStyle.Render(command.Command) +
 			primaryStyle.Render(" ") +
 			countStyle.Render(fmt.Sprintf("%d", command.Count)) +
@@ -32,7 +32,7 @@ func RenderTopCommands(command []Shell.CommandCount) {
 	}
 }
 
-func RenderMistakes(commands []Shell.CommandCount) {
+func RenderInvalid(commands []Shell.CommandCount) {
 	for _, command := range commands {
 		primaryStyle := lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#F0F0F0"))
@@ -46,11 +46,35 @@ func RenderMistakes(commands []Shell.CommandCount) {
 			Foreground(lipgloss.Color("#F0F0F0")).
 			Bold(true)
 
-		output := primaryStyle.Render("You have used ") +
+		output := primaryStyle.Render("You ran ") +
 			commandStyle.Render(command.Command) +
 			primaryStyle.Render(" ") +
 			countStyle.Render(fmt.Sprintf("%d", command.Count)) +
 			primaryStyle.Render(" times but it does not exist")
+
+		fmt.Println(output)
+	}
+}
+
+func RenderValid(commands []Shell.CommandCount) {
+	for _, command := range commands {
+		primaryStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#F0F0F0"))
+
+		commandStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#6bff89")).
+			Background(lipgloss.Color("#0e4a28")).
+			Bold(true)
+
+		countStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#F0F0F0")).
+			Bold(true)
+
+		output := primaryStyle.Render("You ran ") +
+			commandStyle.Render(command.Command) +
+			primaryStyle.Render(" ") +
+			countStyle.Render(fmt.Sprintf("%d", command.Count)) +
+			primaryStyle.Render(" times")
 
 		fmt.Println(output)
 	}
