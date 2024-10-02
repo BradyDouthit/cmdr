@@ -1,15 +1,15 @@
-# Trendify
-Trendify is a CLI tool that helps you analyze your command history.
+# cmdr
+cmdr is a CLI tool that helps you analyze your command history.
 
 ## Features
 
-Trendify provides insights into your command-line usage patterns with the following features:
+cmdr provides insights into your command-line usage patterns with the following features:
 
-1. **Top Commands**: By default, Trendify displays the top 5 most frequently used commands along with their usage count.
+1. **Top Commands**: By default, cmdr displays the top 5 most frequently used commands along with their usage count.
 
    Example:
    ```
-   $ trendify
+   $ cmdr
    You have used git 150 times
    You have used ls 120 times
    You have used cd 100 times
@@ -21,7 +21,7 @@ Trendify provides insights into your command-line usage patterns with the follow
 
    Example:
    ```
-   $ trendify --top=10
+   $ cmdr --top=10
    ```
    This will display the top 10 most frequently used commands.
 
@@ -29,7 +29,7 @@ Trendify provides insights into your command-line usage patterns with the follow
 
    Example:
    ```
-   $ trendify --mistakes --top=2
+   $ cmdr --mistakes --top=2
    You have used gti 5 times but it does not exist
    You have used sl 3 times but it does not exist
    ```
@@ -37,80 +37,80 @@ Trendify provides insights into your command-line usage patterns with the follow
 
    Example:
    ```
-   $ trendify --args
+   $ cmdr --args
    You have used git push 10 times
    You have used ls -l 5 times
    ```
 
 ## Usage
 
-Here are some example commands to get you started with Trendify:
+Here are some example commands to get you started with cmdr:
 
 1. View top 5 most used commands (default behavior):
    ```
-   $ trendify
+   $ cmdr
    ```
 
 2. View top 10 most used commands:
    ```
-   $ trendify --top=10
+   $ cmdr --top=10
    ```
 
 3. View commands that don't exist or have failed:
    ```
-   $ trendify -M
+   $ cmdr -M
    ```
    or
    ```
-   $ trendify --mistakes --top=2
+   $ cmdr --mistakes --top=2
    ```
 
 ## Installation
 
-To install Trendify, you'll need to have Go installed on your system. Follow these steps:
+To install cmdr, you'll need to have Go installed on your system. Follow these steps:
 
 ### Linux
 
 1. Clone the repository:
    ```
-   git clone https://github.com/BradyDouthit/trendify.git
-   cd trendify
+   git clone https://github.com/BradyDouthit/cmdr.git
+   cd cmdr
    ```
 
 2. Build the project:
    ```
-   go build -o trendify
+   go build -o cmdr
    ```
 
 3. Add the compiled binary to your system's PATH:
    ```
-   export PATH=$PATH:/path/to/trendify
+   export PATH=$PATH:/path/to/cmdr
    ```
 
-4. You can now run `trendify` from anywhere in your terminal.
+4. You can now run `cmdr` from anywhere in your terminal.
 
 ### Windows
 
 1. Clone the repository:
    ```
-   git clone https://github.com/BradyDouthit/trendify.git
-   cd trendify
+   git clone https://github.com/BradyDouthit/cmdr.git
+   cd cmdr
    ```
 
 2. Build the project:
    ```
-   go build -o trendify.exe
+   go build -o cmdr.exe
    ```
 
-3. Add the directory containing `trendify.exe` to your system's PATH
+3. Add the directory containing `cmdr.exe` to your system's PATH
 
-4. You can now run `trendify` from anywhere in your command prompt or PowerShell.
+4. You can now run `cmdr` from anywhere in your command prompt or PowerShell.
 
 Note: Make sure you have Go installed and properly configured on your system before following these steps.
 
 ## Dependencies
 
-Trendify uses the following dependencies:
+cmdr uses the following dependencies:
 - [Lipgloss](https://github.com/charmbracelet/lipgloss)
 
 ## Currently Supported Terminal Emulators

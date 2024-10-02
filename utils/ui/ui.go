@@ -1,7 +1,7 @@
 package ui
 
 import (
-	Shell "clilistener/utils/shell"
+	Shell "cmdr/utils/shell"
 	"fmt"
 	"time"
 
