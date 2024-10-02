@@ -34,7 +34,6 @@ var BuiltinCommands = []string{"alias", "bg",
 
 // Experimental function to get command aliases.
 func GetAliases(configPath string) ([]string, error) {
-	fmt.Println(configPath)
 	data, err := os.ReadFile(configPath)
 
 	if err != nil || len(data) == 0 {
@@ -48,8 +47,7 @@ func GetAliases(configPath string) ([]string, error) {
 			fmt.Println(line)
 			alias := sliceBetweenSubstrings(line, "alias ", "=")
 			cmd := sliceBetweenSubstrings(line, "=", "")
-			fmt.Println(alias)
-			fmt.Println(cmd)
+			fmt.Printf("Alias: %s, Command: %s\n", alias, cmd)
 			aliases = append(aliases, alias)
 		}
 	}
