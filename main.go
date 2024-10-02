@@ -35,7 +35,7 @@ func main() {
 	}
 
 	if *showMistakesLong || *showMistakesShort {
-		uniqueCommands := Shell.GetUniqueCommandCounts(history, 999, *includeArgsShort || *includeArgsLong)
+		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
 		failedCommands := Shell.GetFailedCommands(uniqueCommands, *topN)
 		UI.RenderMistakes(failedCommands)
 
