@@ -32,6 +32,31 @@ var BuiltinCommands = []string{"alias", "bg",
 	"source", "suspend", "test", "times", "trap", "type", "typeset", "ulimit", "umask",
 	"un‐alias", "unset", "until", "wait", "while"}
 
+// Experimental function to get command aliases.
+func GetAliases(configPath string) ([]string, error) {
+	fmt.Println(configPath)
+	data, err := os.ReadFile(configPath)
+
+	if err != nil || len(data) == 0 {
+		return []string{}, err
+	}
+
+	var aliases []string
+
+	for _, line := range strings.Split(string(data), "\n") {
+		if strings.HasPrefix(line, "alias ") {
+			fmt.Println(line)
+			alias := sliceBetweenSubstrings(line, "alias ", "=")
+			cmd := sliceBetweenSubstrings(line, "=", "")
+			fmt.Println(alias)
+			fmt.Println(cmd)
+			aliases = append(aliases, alias)
+		}
+	}
+
+	return []string{}, nil
+}
+
 func GetCommand(shell, line string) (Command, error) {
 	if shell == "bash" {
 		command, err := parseCommandOnly(line)
@@ -67,11 +92,11 @@ func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
 	return history, nil
 }
 
-func DetectShell() (string, string, error) {
+func DetectShell() (string, string, string, error) {
 	homeDir, err := os.UserHomeDir()
 
 	if err != nil {
-		return "", "", fmt.Errorf("could not get home directory: %w", err)
+		return "", "", "", fmt.Errorf("could not get home directory: %w", err)
 	}
 
 	shell := os.Getenv("SHELL")
@@ -86,27 +111,36 @@ func DetectShell() (string, string, error) {
 
 	// The path that the CLI history is saved to
 	var historyFilePath string
+	var shellConfigPath string
 
 	switch shellSuffix {
 	case "bash":
 		historyFilePath = filepath.Join(homeDir, ".bash_history")
+		shellConfigPath = filepath.Join(homeDir, ".bashrc")
 		break
 	case "zsh":
 		historyFilePath = filepath.Join(homeDir, ".zsh_history")
+		shellConfigPath = filepath.Join(homeDir, ".zshrc")
 		break
 	case "fish":
 		historyFilePath = filepath.Join(homeDir, ".local", "share", "fish", "fish_history")
+		shellConfigPath = filepath.Join(homeDir, ".config", "fish", "config.fish")
 		break
 	default:
 		historyFilePath = filepath.Join(homeDir, ".bash_history")
+		shellConfigPath = filepath.Join(homeDir, ".bashrc")
 		break
 	}
 
 	if _, err := os.Stat(historyFilePath); errors.Is(err, os.ErrNotExist) {
-		return shellSuffix, "", fmt.Errorf("could not find history file at %s", historyFilePath)
+		return shellSuffix, "", "", fmt.Errorf("could not find history file at %s", historyFilePath)
 	}
 
-	return shellSuffix, historyFilePath, nil
+	if _, err := os.Stat(shellConfigPath); errors.Is(err, os.ErrNotExist) {
+		return shellSuffix, historyFilePath, "", fmt.Errorf("could not find config file at %s", historyFilePath)
+	}
+
+	return shellSuffix, historyFilePath, shellConfigPath, nil
 }
 
 func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []CommandCount {

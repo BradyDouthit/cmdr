@@ -27,7 +27,7 @@ func main() {
 
 	topN := flag.Int("top", 5, "Number of top commands to display")
 	flag.Parse()
-	shell, path, err := Shell.DetectShell()
+	shell, path, config, err := Shell.DetectShell()
 
 	if err != nil {
 		panic(err)
@@ -38,6 +38,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	Shell.GetAliases(config)
 
 	if *showValidShort || *showValidLong {
 		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
