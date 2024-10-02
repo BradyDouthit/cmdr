@@ -33,6 +33,7 @@ var BuiltinCommands = []string{"alias", "bg",
 	"un‐alias", "unset", "until", "wait", "while"}
 
 // Experimental function to get command aliases.
+// TODO: Run this once on startup and compare aliases to the command when checking for validity.
 func GetAliases(configPath string) ([]string, error) {
 	data, err := os.ReadFile(configPath)
 
