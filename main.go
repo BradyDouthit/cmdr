@@ -18,8 +18,13 @@ func main() {
 	mainStart := time.Now()
 	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
 	includeArgsLong := flag.Bool("args", false, "Include arguments in the output")
-	showMistakesLong := flag.Bool("mistakes", false, "Show mistakes (commands that don't exist in the PATH) in the output")
-	showMistakesShort := flag.Bool("M", false, "Show mistakes (commands that don't exist in the PATH) in the output")
+
+	showMistakesLong := flag.Bool("mistakes", false, "Show mistakes (commands that aren't available on your system) in the output")
+	showMistakesShort := flag.Bool("M", false, "Show mistakes (commands that aren't available on your system) in the output")
+
+	showValidLong := flag.Bool("valid", false, "Show valid commands in the output")
+	showValidShort := flag.Bool("V", false, "Show valid commands in the output")
+
 	topN := flag.Int("top", 5, "Number of top commands to display")
 	flag.Parse()
 	shell, path, err := Shell.DetectShell()
@@ -34,9 +39,17 @@ func main() {
 		panic(err)
 	}
 
+	if *showValidShort || *showValidLong {
+		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
+		failedCommands := Shell.GetCommandsExist(uniqueCommands, *topN, true)
+		UI.RenderValid(failedCommands)
+
+		exit(0, mainStart)
+	}
+
 	if *showMistakesLong || *showMistakesShort {
 		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
-		failedCommands := Shell.GetFailedCommands(uniqueCommands, *topN)
+		failedCommands := Shell.GetCommandsExist(uniqueCommands, *topN, false)
 		UI.RenderMistakes(failedCommands)
 
 		exit(0, mainStart)

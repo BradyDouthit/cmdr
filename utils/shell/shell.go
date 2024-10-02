@@ -163,7 +163,7 @@ func GetCommandExists(command string) bool {
 	return false
 }
 
-func GetFailedCommands(history []CommandCount, count int) []CommandCount {
+func GetCommandsExist(history []CommandCount, count int, e bool) []CommandCount {
 	var failedCommands []CommandCount
 	var wg sync.WaitGroup
 
@@ -173,7 +173,7 @@ func GetFailedCommands(history []CommandCount, count int) []CommandCount {
 			defer wg.Done()
 
 			exists := GetCommandExists(cmd.Command)
-			if !exists {
+			if exists == e {
 				if len(failedCommands) < count {
 					failedCommands = append(failedCommands, CommandCount{Command: cmd.Command, Count: cmd.Count, Exists: exists})
 				}
