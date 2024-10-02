@@ -113,6 +113,10 @@ Note: Make sure you have Go installed and properly configured on your system bef
 Trendify uses the following dependencies:
 - [Lipgloss](https://github.com/charmbracelet/lipgloss)
 
+## Currently Supported Terminal Emulators
+- `zsh`
+- `bash`
+
 ## Contributing
 
 [Add contribution guidelines here]

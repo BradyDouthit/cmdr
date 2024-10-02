@@ -25,22 +25,11 @@ type CommandCount struct {
 
 func GetCommand(shell, line string) (Command, error) {
 	if shell == "bash" {
-		parts := strings.Split(line, " ")
-
-		if len(parts) == 0 {
-			return Command{}, errors.New("Found an empty line in the history file")
-		}
-
-		mainCommand := strings.TrimSpace(parts[0])
-
-		if len(mainCommand) == 0 {
-			return Command{}, errors.New("Found an empty command in the history file")
-		}
-
-		return Command{
-			Command: mainCommand,
-			Args:    parts[1:],
-		}, nil
+		command, err := parseCommandOnly(line)
+		return command, err
+	} else if shell == "zsh" {
+		command, err := getZshCommand(line)
+		return command, err
 	}
 
 	// TODO: Add support for other shells
@@ -187,6 +176,33 @@ func GetFailedCommands(history []CommandCount, count int) []CommandCount {
 	return failedCommands
 }
 
+func parseCommandOnly(line string) (Command, error) {
+	parts := strings.Split(line, " ")
+
+	if len(parts) == 0 {
+		return Command{}, errors.New("Found an empty line in the history file")
+	}
+
+	mainCommand := strings.TrimSpace(parts[0])
+
+	if len(mainCommand) == 0 {
+		return Command{}, errors.New("Found an empty command in the history file")
+	}
+
+	return Command{
+		Command: mainCommand,
+		Args:    parts[1:],
+	}, nil
+
+}
+
+func getZshCommand(line string) (Command, error) {
+	rawCommand := sliceBetweenSubstrings(line, ";", "")
+	cmd, err := parseCommandOnly(rawCommand)
+
+	return cmd, err
+}
+
 func sliceBetweenSubstrings(str, start, end string) string {
 	startIndex := strings.Index(str, start)
 	if startIndex == -1 {
@@ -195,9 +211,12 @@ func sliceBetweenSubstrings(str, start, end string) string {
 	startIndex += len(start)
 
 	endIndex := strings.Index(str[startIndex:], end)
-	if endIndex == -1 {
-		return "" // End substring not found
+
+	// If the end substring is empty, return the rest of the string
+	if endIndex == -1 || end == "" {
+		return str[startIndex:] // End substring not found
 	}
+
 	endIndex += startIndex
 
 	return str[startIndex:endIndex]
