@@ -114,9 +114,11 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 
 	for _, cmd := range history {
 		if includeArgs {
-			fullCommand := cmd.Command + " " + strings.Join(cmd.Args, " ")
-			prevCount := commandCounts[fullCommand].Count
-			commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1, Valid: cmd.Valid}
+			if len(cmd.Args) > 0 {
+				fullCommand := cmd.Command + " " + strings.Join(cmd.Args, " ")
+				prevCount := commandCounts[fullCommand].Count
+				commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1, Valid: cmd.Valid}
+			}
 		} else {
 			prevCount := commandCounts[cmd.Command].Count
 			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1, Valid: cmd.Valid}
