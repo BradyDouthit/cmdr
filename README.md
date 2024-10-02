@@ -118,10 +118,4 @@ cmdr uses the following dependencies:
 - `bash`
 
 ## Contributing
-
-[Add contribution guidelines here]
-
-## License
-
-[Add license information here]
-
+Feel free to contribute to cmdr by submitting a pull request or opening an issue. Your contributions and ideas are welcome!

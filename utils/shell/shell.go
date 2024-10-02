@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -22,6 +23,14 @@ type CommandCount struct {
 	Count   int
 	Exists  bool
 }
+
+var BuiltinCommands = []string{"alias", "bg",
+	"bind", "break", "builtin", "case", "cd", "command", "compgen", "complete", "continue",
+	"declare", "dirs", "disown", "echo", "enable", "eval", "exec", "exit", "export", "fc",
+	"fg", "getopts", "hash", "help", "history", "if", "jobs", "kill", "let", "local", "logout",
+	"popd", "printf", "pushd", "pwd", "read", "readonly", "return", "set", "shift", "shopt",
+	"source", "suspend", "test", "times", "trap", "type", "typeset", "ulimit", "umask",
+	"un‐alias", "unset", "until", "wait", "while"}
 
 func GetCommand(shell, line string) (Command, error) {
 	if shell == "bash" {
@@ -132,6 +141,11 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 }
 
 func GetCommandExists(command string) bool {
+	// Validate that this works on windows
+	if slices.Contains(BuiltinCommands, command) {
+		return true
+	}
+
 	_, err := exec.LookPath(command)
 
 	if err == nil {
