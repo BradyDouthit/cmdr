@@ -33,13 +33,14 @@ func main() {
 		panic(err)
 	}
 
+	Shell.GetAliases(config)
+
+	// TODO: Add aliases when getting history
 	history, err := Shell.GetCommandHistory(shell, path)
 
 	if err != nil {
 		panic(err)
 	}
-
-	Shell.GetAliases(config)
 
 	if *showValidShort || *showValidLong {
 		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
