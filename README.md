@@ -5,6 +5,9 @@ cmdr is a CLI tool that helps you analyze your command history.
 
 cmdr provides insights into your command-line usage patterns with the following features:
 
+
+### Examples
+
 1. **Top Commands**: By default, cmdr displays the top 5 most frequently used commands along with their usage count.
 
    Example:
@@ -25,7 +28,7 @@ cmdr provides insights into your command-line usage patterns with the following 
    ```
    This will display the top 10 most frequently used commands.
 
-3. **Most Common Mistakes**: Use the `-M` or `--invalid` flag to see commands that you've attempted to run but don't exist or have failed.
+3. **Most Commonly Invalid Commands**: Use the `-I` or `--invalid` flag to see commands that you've attempted to run but don't exist or have failed.
 
    Example:
    ```
@@ -33,7 +36,18 @@ cmdr provides insights into your command-line usage patterns with the following 
    You have used gti 5 times but it does not exist
    You have used sl 3 times but it does not exist
    ```
-4. **Include or Exclude Arguments**: Use the `--args` flag to include arguments. They are excluded by default.
+4. **Valid Commands**: Use the `-V` or `--valid` flag to see commands that you've attempted to run but don't exist or have failed.
+
+   Example:
+   ```
+   $ cmdr --valid
+   You ran go 143 times
+   You ran ls 124 times
+   You ran clear 105 times
+   You ran cd 96 times
+   You ran git 67 times
+   ```
+5. **Include or Exclude Arguments**: Use the `--args` flag to include arguments. They are excluded by default.
 
    Example:
    ```
@@ -41,28 +55,14 @@ cmdr provides insights into your command-line usage patterns with the following 
    You have used git push 10 times
    You have used ls -l 5 times
    ```
+6. **Combine Flags**: You can combine flags to get the desired output.
 
-## Usage
-
-Here are some example commands to get you started with cmdr:
-
-1. View top 5 most used commands (default behavior):
+   Example:
    ```
-   $ cmdr
-   ```
-
-2. View top 10 most used commands:
-   ```
-   $ cmdr --top=10
-   ```
-
-3. View commands that don't exist or have failed:
-   ```
-   $ cmdr -I
-   ```
-   or
-   ```
-   $ cmdr --invalid --top=2
+   $ cmdr --args --valid --top=3 
+   You ran go run . 45 times
+   You ran cd .. 21 times
+   You ran npm run dev 14 times
    ```
 
 ## Installation
