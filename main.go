@@ -41,16 +41,42 @@ func main() {
 
 	if *showValidShort || *showValidLong {
 		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
-		failedCommands := Shell.GetCommandsExist(uniqueCommands, *topN, true)
-		UI.RenderValid(failedCommands)
+
+		var validCommands []Shell.CommandCount
+
+		for _, command := range uniqueCommands {
+			if command.Valid {
+				validCommands = append(validCommands, command)
+			}
+		}
+
+		if len(uniqueCommands) > *topN {
+			val := validCommands[:*topN]
+			UI.RenderValid(val)
+		} else {
+			UI.RenderValid(uniqueCommands)
+		}
 
 		exit(0, mainStart)
 	}
 
 	if *showMistakesLong || *showMistakesShort {
 		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
-		failedCommands := Shell.GetCommandsExist(uniqueCommands, *topN, false)
-		UI.RenderMistakes(failedCommands)
+
+		var invalidCommands []Shell.CommandCount
+
+		for _, command := range uniqueCommands {
+			if !command.Valid {
+				invalidCommands = append(invalidCommands, command)
+			}
+		}
+
+		if len(uniqueCommands) > *topN {
+			inv := invalidCommands[:*topN]
+			UI.RenderMistakes(inv)
+		} else {
+			UI.RenderMistakes(invalidCommands)
+		}
 
 		exit(0, mainStart)
 	}

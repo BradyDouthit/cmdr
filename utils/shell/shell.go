@@ -10,18 +10,18 @@ import (
 	"slices"
 	"sort"
 	"strings"
-	"sync"
 )
 
 type Command struct {
 	Command string   // The command itself
 	Args    []string // The arguments passed to the command
+	Valid   bool
 }
 
 type CommandCount struct {
 	Command string
 	Count   int
-	Exists  bool
+	Valid   bool
 }
 
 var BuiltinCommands = []string{"alias", "bg",
@@ -116,10 +116,10 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 		if includeArgs {
 			fullCommand := cmd.Command + " " + strings.Join(cmd.Args, " ")
 			prevCount := commandCounts[fullCommand].Count
-			commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1}
+			commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1, Valid: cmd.Valid}
 		} else {
 			prevCount := commandCounts[cmd.Command].Count
-			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1}
+			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1, Valid: cmd.Valid}
 		}
 	}
 
@@ -163,33 +163,6 @@ func GetCommandExists(command string) bool {
 	return false
 }
 
-func GetCommandsExist(history []CommandCount, count int, e bool) []CommandCount {
-	var failedCommands []CommandCount
-	var wg sync.WaitGroup
-
-	for _, cmd := range history {
-		wg.Add(1)
-		go func(cmd CommandCount) {
-			defer wg.Done()
-
-			exists := GetCommandExists(cmd.Command)
-			if exists == e {
-				if len(failedCommands) < count {
-					failedCommands = append(failedCommands, CommandCount{Command: cmd.Command, Count: cmd.Count, Exists: exists})
-				}
-			}
-		}(cmd)
-	}
-
-	wg.Wait()
-
-	sort.Slice(failedCommands, func(i, j int) bool {
-		return failedCommands[i].Count > failedCommands[j].Count
-	})
-
-	return failedCommands
-}
-
 func parseCommandOnly(line string) (Command, error) {
 	parts := strings.Split(line, " ")
 
@@ -206,6 +179,7 @@ func parseCommandOnly(line string) (Command, error) {
 	return Command{
 		Command: mainCommand,
 		Args:    parts[1:],
+		Valid:   GetCommandExists(mainCommand),
 	}, nil
 
 }
