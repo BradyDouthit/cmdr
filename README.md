@@ -1,12 +1,7 @@
 # cmdr
 `cmdr` is a CLI tool with a goal of helping develpers understand their CLI usage in order to improve efficiency.
 
-## Features
-
-cmdr provides insights into your command-line usage patterns with the following features:
-
-
-### Examples
+## Examples
 
 1. **Top Commands**: By default, cmdr displays the top 5 most frequently used commands along with their usage count.
 
