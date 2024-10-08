@@ -15,13 +15,18 @@ import (
 type Command struct {
 	Command string   // The command itself
 	Args    []string // The arguments passed to the command
-	Valid   bool
+	Valid   bool     // Whether or not the command was actually valid (it exists in the PATH etc.)
 }
 
 type CommandCount struct {
 	Command string
 	Count   int
 	Valid   bool
+}
+
+type Alias struct {
+	Command string // The underlying command that has been aliased
+	Alias   string // The aliased command
 }
 
 var BuiltinCommands = []string{"alias", "bg",
@@ -34,42 +39,42 @@ var BuiltinCommands = []string{"alias", "bg",
 
 // Experimental function to get command aliases.
 // TODO: Run this once on startup and compare aliases to the command when checking for validity.
-func GetAliases(configPath string) ([]string, error) {
+func GetAliases(configPath string) ([]Alias, error) {
 	data, err := os.ReadFile(configPath)
 
 	if err != nil || len(data) == 0 {
-		return []string{}, err
+		return []Alias{}, err
 	}
 
-	var aliases []string
+	var aliases []Alias
 
 	for _, line := range strings.Split(string(data), "\n") {
 		if strings.HasPrefix(line, "alias ") {
-			fmt.Println(line)
 			alias := sliceBetweenSubstrings(line, "alias ", "=")
 			cmd := sliceBetweenSubstrings(line, "=", "")
-			fmt.Printf("Alias: %s, Command: %s\n", alias, cmd)
-			aliases = append(aliases, alias)
+			aliases = append(aliases, Alias{Alias: alias, Command: strings.Trim(cmd, "\"")})
 		}
 	}
 
-	return []string{}, nil
+	return aliases, nil
 }
 
-func GetCommand(shell, line string) (Command, error) {
+func GetCommand(shell, line string, aliases []Alias) (Command, error) {
+
 	if shell == "bash" {
-		command, err := parseCommandOnly(line)
+		command, err := parseCommandOnly(line, aliases)
 		return command, err
 	} else if shell == "zsh" {
-		command, err := getZshCommand(line)
-		return command, err
+		rawCommand := sliceBetweenSubstrings(line, ";", "")
+		cmd, err := parseCommandOnly(rawCommand, aliases)
+		return cmd, err
 	}
 
 	// TODO: Add support for other shells
 	return Command{}, nil
 }
 
-func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
+func GetCommandHistory(shell, historyFilePath string, aliases []Alias) ([]Command, error) {
 	var history []Command
 
 	data, err := os.ReadFile(historyFilePath)
@@ -79,7 +84,7 @@ func GetCommandHistory(shell, historyFilePath string) ([]Command, error) {
 	}
 
 	for _, line := range strings.Split(string(data), "\n") {
-		command, err := GetCommand(shell, line)
+		command, err := GetCommand(shell, line, aliases)
 
 		if err != nil {
 			continue
@@ -202,7 +207,18 @@ func GetCommandExists(command string) bool {
 	return false
 }
 
-func parseCommandOnly(line string) (Command, error) {
+func commandIsAliased(command string, aliases []Alias) bool {
+	for _, alias := range aliases {
+
+		if alias.Alias == command {
+			return true
+		}
+	}
+	return false
+}
+
+// The base function that takes in a line from a file and parses out the command, if any.
+func parseCommandOnly(line string, aliases []Alias) (Command, error) {
 	parts := strings.Split(line, " ")
 
 	if len(parts) == 0 {
@@ -215,19 +231,19 @@ func parseCommandOnly(line string) (Command, error) {
 		return Command{}, errors.New("Found an empty command in the history file")
 	}
 
+	isAliased := commandIsAliased(mainCommand, aliases)
+	isCommandValid := isAliased || GetCommandExists(mainCommand)
+
+	if mainCommand == "ga" {
+		fmt.Printf("found alias ga. isCommandValid? %v\n", isCommandValid)
+	}
+
 	return Command{
 		Command: mainCommand,
 		Args:    parts[1:],
-		Valid:   GetCommandExists(mainCommand),
+		Valid:   isCommandValid,
 	}, nil
 
-}
-
-func getZshCommand(line string) (Command, error) {
-	rawCommand := sliceBetweenSubstrings(line, ";", "")
-	cmd, err := parseCommandOnly(rawCommand)
-
-	return cmd, err
 }
 
 func sliceBetweenSubstrings(str, start, end string) string {
