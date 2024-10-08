@@ -4,6 +4,7 @@ import (
 	Shell "cmdr/utils/shell"
 	UI "cmdr/utils/ui"
 	"flag"
+	"fmt"
 	"os"
 	"time"
 )
@@ -27,13 +28,21 @@ func main() {
 
 	topN := flag.Int("top", 5, "Number of top commands to display")
 	flag.Parse()
-	shell, path, err := Shell.DetectShell()
+	shell, path, config, err := Shell.DetectShell()
 
 	if err != nil {
 		panic(err)
 	}
 
-	history, err := Shell.GetCommandHistory(shell, path)
+	aliases, err := Shell.GetAliases(config)
+	fmt.Printf("Aliases: %v\n", aliases)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// TODO: Add aliases when getting history
+	history, err := Shell.GetCommandHistory(shell, path, aliases)
 
 	if err != nil {
 		panic(err)
