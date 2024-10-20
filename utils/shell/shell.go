@@ -209,6 +209,16 @@ func GetCommandExists(command string) bool {
 	return false
 }
 
+func GetUnaliasedCommand(command string, aliases []Alias) (string, error) {
+	for _, alias := range aliases {
+		if alias.Alias == command {
+			return alias.Command, nil
+		}
+	}
+
+	return "", errors.New("Un-aliased command not found")
+}
+
 func commandIsAliased(command string, aliases []Alias) bool {
 	for _, alias := range aliases {
 

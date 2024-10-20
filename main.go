@@ -58,9 +58,9 @@ func main() {
 
 		if len(validCommands) > *topN {
 			val := validCommands[:*topN]
-			UI.RenderValid(val)
+			UI.RenderValid(val, aliases)
 		} else {
-			UI.RenderValid(validCommands)
+			UI.RenderValid(validCommands, aliases)
 		}
 
 		exit(0, mainStart)

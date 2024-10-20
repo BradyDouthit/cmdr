@@ -56,7 +56,7 @@ func RenderInvalid(commands []Shell.CommandCount) {
 	}
 }
 
-func RenderValid(commands []Shell.CommandCount) {
+func RenderValid(commands []Shell.CommandCount, aliases []Shell.Alias) {
 	for _, command := range commands {
 		primaryStyle := lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#F0F0F0"))
@@ -70,23 +70,28 @@ func RenderValid(commands []Shell.CommandCount) {
 			Foreground(lipgloss.Color("#F0F0F0")).
 			Bold(true)
 
+		var output string
+
 		if command.Aliased {
-			output := primaryStyle.Render("You ran ") +
+			unaliasedCommand, err := Shell.GetUnaliasedCommand(command.Command, aliases)
+
+			if err != nil {
+			}
+
+			output = primaryStyle.Render("You ran ") +
 				commandStyle.Render(command.Command) +
-				primaryStyle.Render(" (aliased) ") +
+				primaryStyle.Render(fmt.Sprintf(" (alias for %s)", commandStyle.Render(unaliasedCommand))) +
 				countStyle.Render(fmt.Sprintf("%d", command.Count)) +
 				primaryStyle.Render(" times")
-			fmt.Println(output)
 		} else {
-			output := primaryStyle.Render("You ran ") +
+			output = primaryStyle.Render("You ran ") +
 				commandStyle.Render(command.Command) +
 				primaryStyle.Render(" ") +
 				countStyle.Render(fmt.Sprintf("%d", command.Count)) +
 				primaryStyle.Render(" times")
-
-			fmt.Println(output)
-
 		}
+
+		fmt.Println(output)
 
 	}
 }
