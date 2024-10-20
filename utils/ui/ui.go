@@ -72,12 +72,9 @@ func RenderValid(commands []Shell.CommandCount, aliases []Shell.Alias) {
 
 		var output string
 
-		if command.Aliased {
-			unaliasedCommand, err := Shell.GetUnaliasedCommand(command.Command, aliases)
+		unaliasedCommand, err := Shell.GetUnaliasedCommand(command.Command, aliases)
 
-			if err != nil {
-			}
-
+		if command.Aliased && err == nil {
 			output = primaryStyle.Render("You ran ") +
 				commandStyle.Render(command.Command) +
 				primaryStyle.Render(fmt.Sprintf(" (alias for %s)", commandStyle.Render(unaliasedCommand))) +
