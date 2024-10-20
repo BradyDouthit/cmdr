@@ -16,12 +16,14 @@ type Command struct {
 	Command string   // The command itself
 	Args    []string // The arguments passed to the command
 	Valid   bool     // Whether or not the command was actually valid (it exists in the PATH etc.)
+	Aliased bool     // Whether or not the command was aliased
 }
 
 type CommandCount struct {
-	Command string
-	Count   int
-	Valid   bool
+	Command string // The command itself
+	Count   int    // The number of times the command was run
+	Valid   bool   // Whether or not the command was actually valid (it exists in the PATH etc.)
+	Aliased bool   // Whether or not the command was aliased
 }
 
 type Alias struct {
@@ -155,11 +157,11 @@ func GetUniqueCommandCounts(history []Command, count int, includeArgs bool) []Co
 			if len(cmd.Args) > 0 {
 				fullCommand := cmd.Command + " " + strings.Join(cmd.Args, " ")
 				prevCount := commandCounts[fullCommand].Count
-				commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1, Valid: cmd.Valid}
+				commandCounts[fullCommand] = CommandCount{Command: fullCommand, Count: prevCount + 1, Valid: cmd.Valid, Aliased: cmd.Aliased}
 			}
 		} else {
 			prevCount := commandCounts[cmd.Command].Count
-			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1, Valid: cmd.Valid}
+			commandCounts[cmd.Command] = CommandCount{Command: cmd.Command, Count: prevCount + 1, Valid: cmd.Valid, Aliased: cmd.Aliased}
 		}
 	}
 
@@ -238,6 +240,7 @@ func parseCommandOnly(line string, aliases []Alias) (Command, error) {
 		Command: mainCommand,
 		Args:    parts[1:],
 		Valid:   isCommandValid,
+		Aliased: isAliased,
 	}, nil
 
 }

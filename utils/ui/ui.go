@@ -70,13 +70,24 @@ func RenderValid(commands []Shell.CommandCount) {
 			Foreground(lipgloss.Color("#F0F0F0")).
 			Bold(true)
 
-		output := primaryStyle.Render("You ran ") +
-			commandStyle.Render(command.Command) +
-			primaryStyle.Render(" ") +
-			countStyle.Render(fmt.Sprintf("%d", command.Count)) +
-			primaryStyle.Render(" times")
+		if command.Aliased {
+			output := primaryStyle.Render("You ran ") +
+				commandStyle.Render(command.Command) +
+				primaryStyle.Render(" (aliased) ") +
+				countStyle.Render(fmt.Sprintf("%d", command.Count)) +
+				primaryStyle.Render(" times")
+			fmt.Println(output)
+		} else {
+			output := primaryStyle.Render("You ran ") +
+				commandStyle.Render(command.Command) +
+				primaryStyle.Render(" ") +
+				countStyle.Render(fmt.Sprintf("%d", command.Count)) +
+				primaryStyle.Render(" times")
 
-		fmt.Println(output)
+			fmt.Println(output)
+
+		}
+
 	}
 }
 
