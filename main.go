@@ -27,13 +27,19 @@ func main() {
 
 	topN := flag.Int("top", 5, "Number of top commands to display")
 	flag.Parse()
-	shell, path, err := Shell.DetectShell()
+	shell, path, config, err := Shell.DetectShell()
 
 	if err != nil {
 		panic(err)
 	}
 
-	history, err := Shell.GetCommandHistory(shell, path)
+	aliases, err := Shell.GetAliases(config)
+
+	if err != nil {
+		panic(err)
+	}
+
+	history, err := Shell.GetCommandHistory(shell, path, aliases)
 
 	if err != nil {
 		panic(err)
@@ -52,9 +58,9 @@ func main() {
 
 		if len(validCommands) > *topN {
 			val := validCommands[:*topN]
-			UI.RenderValid(val)
+			UI.RenderValid(val, aliases)
 		} else {
-			UI.RenderValid(validCommands)
+			UI.RenderValid(validCommands, aliases)
 		}
 
 		exit(0, mainStart)
