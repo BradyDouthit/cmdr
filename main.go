@@ -4,7 +4,6 @@ import (
 	Shell "cmdr/utils/shell"
 	UI "cmdr/utils/ui"
 	"flag"
-	"fmt"
 	"os"
 	"time"
 )
@@ -35,13 +34,11 @@ func main() {
 	}
 
 	aliases, err := Shell.GetAliases(config)
-	fmt.Printf("Aliases: %v\n", aliases)
 
 	if err != nil {
 		panic(err)
 	}
 
-	// TODO: Add aliases when getting history
 	history, err := Shell.GetCommandHistory(shell, path, aliases)
 
 	if err != nil {

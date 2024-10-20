@@ -234,10 +234,6 @@ func parseCommandOnly(line string, aliases []Alias) (Command, error) {
 	isAliased := commandIsAliased(mainCommand, aliases)
 	isCommandValid := isAliased || GetCommandExists(mainCommand)
 
-	if mainCommand == "ga" {
-		fmt.Printf("found alias ga. isCommandValid? %v\n", isCommandValid)
-	}
-
 	return Command{
 		Command: mainCommand,
 		Args:    parts[1:],
