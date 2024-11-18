@@ -1,3 +1,5 @@
+github.com/BradyDouthit/switchboard v0.0.0-20241118033217-d48082c92baa h1:DnhJRna62MBN/YwN0NoEl9q8yCaA4dclnq2PLIuViFo=
+github.com/BradyDouthit/switchboard v0.0.0-20241118033217-d48082c92baa/go.mod h1:VIq0y/LgWCs6SiXzIkKfo4wCsWNY6p+7ZUcjeED8hpQ=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1 h1:HwpRHbFMcZLEVr42D4p7XBqjyuxQH5SMiErDT4WkJ2k=
 github.com/aymanbagabas/go-osc52/v2 v2.0.1/go.mod h1:uYgXzlJ7ZpABp8OJ+exZzJJhRNQ2ASbcXHWsFqH8hp8=
 github.com/charmbracelet/lipgloss v0.13.0 h1:4X3PPeoWEDCMvzDvGmTajSyYPcZM4+y8sCA/SsA3cjw=
