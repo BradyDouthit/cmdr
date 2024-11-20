@@ -3,9 +3,11 @@ package main
 import (
 	Shell "cmdr/utils/shell"
 	UI "cmdr/utils/ui"
-	"flag"
 	"os"
+	"strconv"
 	"time"
+
+	"github.com/BradyDouthit/switchboard"
 )
 
 func exit(code int, startTime time.Time) {
@@ -14,19 +16,26 @@ func exit(code int, startTime time.Time) {
 	os.Exit(code)
 }
 
+func addModifierArgs(cmd *switchboard.Command, topN *int, includeArgs *bool) {
+	cmd.Flag("t", "top", "Filter for the top N commands", false, func(s string) error {
+		t, err := strconv.Atoi(s)
+
+		if err != nil {
+			return err
+		}
+
+		*topN = t
+		return nil
+	})
+
+	cmd.BoolFlag("a", "args", "Include arguments in the resulting commands", func(b bool) error {
+		*includeArgs = b
+		return nil
+	})
+}
+
 func main() {
 	mainStart := time.Now()
-	includeArgsShort := flag.Bool("A", false, "Include arguments in the output")
-	includeArgsLong := flag.Bool("args", false, "Include arguments in the output")
-
-	showInvalidLong := flag.Bool("invalid", false, "Show invalid (commands that aren't available on your system) in the output")
-	showInvalidShort := flag.Bool("I", false, "Show invalid (commands that aren't available on your system) in the output")
-
-	showValidLong := flag.Bool("valid", false, "Show valid commands in the output")
-	showValidShort := flag.Bool("V", false, "Show valid commands in the output")
-
-	topN := flag.Int("top", 5, "Number of top commands to display")
-	flag.Parse()
 	shell, path, config, err := Shell.DetectShell()
 
 	if err != nil {
@@ -45,50 +54,60 @@ func main() {
 		panic(err)
 	}
 
-	if *showValidShort || *showValidLong {
-		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
+	app := switchboard.New()
 
+	app.Command("valid", "Filter for VALID commands you have run", func(c *switchboard.Command) {
+		var topN int = 5
+		var includeArgs bool = false
 		var validCommands []Shell.CommandCount
 
-		for _, command := range uniqueCommands {
-			if command.Valid {
-				validCommands = append(validCommands, command)
+		// Updates topN and includeArgs
+		addModifierArgs(c, &topN, &includeArgs)
+
+		c.Run(func() {
+			uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, includeArgs)
+			for _, command := range uniqueCommands {
+				if command.Valid {
+					validCommands = append(validCommands, command)
+				}
 			}
-		}
 
-		if len(validCommands) > *topN {
-			val := validCommands[:*topN]
-			UI.RenderValid(val, aliases)
-		} else {
-			UI.RenderValid(validCommands, aliases)
-		}
-
-		exit(0, mainStart)
-	}
-
-	if *showInvalidLong || *showInvalidShort {
-		uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, *includeArgsShort || *includeArgsLong)
-
-		var invalidCommands []Shell.CommandCount
-
-		for _, command := range uniqueCommands {
-			if !command.Valid {
-				invalidCommands = append(invalidCommands, command)
+			if len(validCommands) > topN {
+				val := validCommands[:topN]
+				UI.RenderValid(val, aliases)
+			} else {
+				UI.RenderValid(validCommands, aliases)
 			}
-		}
+		})
+	})
 
-		if len(invalidCommands) > *topN {
-			inv := invalidCommands[:*topN]
-			UI.RenderInvalid(inv)
-		} else {
-			UI.RenderInvalid(invalidCommands)
-		}
+	app.Command("invalid", "Filter for INVALID commands you have run", func(c *switchboard.Command) {
+		var topN int = 5
+		var includeArgs bool = false
 
-		exit(0, mainStart)
-	}
+		// Updates topN and includeArgs
+		addModifierArgs(c, &topN, &includeArgs)
 
-	topCommands := Shell.GetUniqueCommandCounts(history, *topN, *includeArgsShort || *includeArgsLong)
-	UI.RenderTopCommands(topCommands)
+		c.Run(func() {
+			var invalidCommands []Shell.CommandCount
+			uniqueCommands := Shell.GetUniqueCommandCounts(history, 10000, includeArgs)
+
+			for _, command := range uniqueCommands {
+				if !command.Valid {
+					invalidCommands = append(invalidCommands, command)
+				}
+			}
+
+			if len(invalidCommands) > topN {
+				inv := invalidCommands[:topN]
+				UI.RenderInvalid(inv)
+			} else {
+				UI.RenderInvalid(invalidCommands)
+			}
+		})
+	})
+
+	app.Run()
 
 	exit(0, mainStart)
 }

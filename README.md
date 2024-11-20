@@ -18,7 +18,7 @@
    You have used docker 50 times
    ```
 
-2. **Customizable Results**: Use the `--top` flag followed by a number to specify how many top commands you want to see.
+2. **Customizable Results**: Use the `-t` or `--top` flag followed by a number to specify how many top commands you want to see.
 
    Example:
    ```
@@ -26,30 +26,30 @@
    ```
    This will display the top 10 most frequently used commands.
 
-3. **Most Commonly Invalid Commands**: Use the `-I` or `--invalid` flag to see commands that you've attempted to run but don't exist or have failed.
+3. **Most Commonly Invalid Commands**: Use the or `invalid` command to see commands that you've attempted to run but don't exist or have failed.
 
    Example:
    ```
-   $ cmdr --invalid --top=2
+   $ cmdr invalid --top=2
    You have used gti 5 times but it does not exist
    You have used sl 3 times but it does not exist
    ```
-4. **Valid Commands**: Use the `-V` or `--valid` flag to see commands that you've attempted to run but don't exist or have failed.
+4. **Valid Commands**: Use the `valid` command to see commands that you've attempted to run but don't exist or have failed.
 
    Example:
    ```
-   $ cmdr --valid
+   $ cmdr valid
    You ran go 143 times
    You ran ls 124 times
    You ran clear 105 times
    You ran cd 96 times
    You ran git 67 times
    ```
-5. **Include or Exclude Arguments**: Use the `--args` flag to include arguments. They are excluded by default.
+5. **Include or Exclude Arguments**: Use the `-a` or `--args` flag to include arguments. They are excluded by default.
 
    Example:
    ```
-   $ cmdr --args
+   $ cmdr valid --args
    You have used git push 10 times
    You have used ls -l 5 times
    ```
@@ -57,7 +57,7 @@
 
    Example:
    ```
-   $ cmdr --args --valid --top=3 
+   $ cmdr valid --args --top=3 
    You ran go run . 45 times
    You ran cd .. 21 times
    You ran npm run dev 14 times
