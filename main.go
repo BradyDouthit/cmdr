@@ -28,7 +28,7 @@ func addModifierArgs(cmd *switchboard.Command, topN *int, includeArgs *bool) {
 		return nil
 	})
 
-	cmd.BoolFlag("a", "args", "Include arguments in the resulting commands", func(b bool) error {
+	cmd.BoolFlag("a", "args", "Include arguments in the resulting commands", false, func(b bool) error {
 		*includeArgs = b
 		return nil
 	})
