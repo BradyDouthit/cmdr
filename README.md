@@ -110,6 +110,7 @@ Note: Make sure you have Go installed and properly configured on your system bef
 
 cmdr uses the following dependencies:
 - [Lipgloss](https://github.com/charmbracelet/lipgloss)
+- [switchboard](https://github.com/BradyDouthit/switchboard)
 
 ## Currently Supported Terminal Emulators
 - `zsh`
